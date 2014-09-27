@@ -1,75 +1,92 @@
 /*
- * Genetic Algorithm
+ * genetic.cpp
+ *
+ *  Created on: 28-Sep-2014
+ *      Author: Kaushik, Pramod
  */
+
+
 #include "genetic.h"
-#include <malloc.h>
 #include <algorithm>
-#include <cstdlib>
 #include <iostream>
 
+extern int nocities;
+extern float**  distances;
 
-Genetic :: Genetic(int a,float** B)
+/*Genetic::Genetic(int a,float** B)
 {
 	nocities = a ;
 	distances = B ;
-
-	int i,j;
-
-	//(*generation)[nocities] = malloc(sizeof(*generation) * POP_SIZE); // generation[POP_SIZE][nocities]
-
-	generation = new int*[POP_SIZE+1];
-	
-	for(i = 1; i <= POP_SIZE; i++)
-	{
-		generation[i] = new int[nocities+1];
-		for(j = 1; j <= nocities; j++)
-		{
-			generation[i][j] = j;
-		}	
-	}
-
-}			
+}*/
 
 int* Genetic::getsoln(){
-	
-	Initializer();
-	printgen();
+
+	gen.initialize();
+	gen.print();
 
 	return NULL;
 }
 
-void Genetic :: Initializer ()
+void Generation::initialize ()
 {
-	int i,j;
-
-	for(i = 1; i <= POP_SIZE; i++)
+	for(int i = 1; i <= POP_SIZE; i++)
 	{
-		std::random_shuffle (&generation[i][1],&generation[i][nocities]+1);
+		candidates[i].randomise();
 		//std::cerr << cost(&generation[i][0]) << "\n";
 	}
 }
 
-void Genetic::printgen()
+void Generation::print()
 {
-	int i,j;
-	
+	int i;
+
 	for(i = 1; i <= POP_SIZE; i++)
 	{
-		for(j = 1; j <= nocities; j++)
-		{
-			std::cout <<  generation[i][j] << " ";
-		}
-		std::cout << "\n";	
+		std::cout << candidates[i].getcost() << " ";
+		//candidates[i].print();
+		std::cout << "\n";
 	}
 }
 
-int Genetic::cost(int* tour)
+Tour::Tour()
+{
+	order = new int[nocities+1];
+
+	for(int i=0; i<=nocities; i++){
+		order[i] = i;
+	}
+}
+
+void Tour::setcost()
 {
 	int i;
 	int sum = 0;
 	for(i=1;i<nocities;i++)
 	{
-		sum += distances[tour[i]][tour[i+1]];
+		sum += distances[order[i]][order[i+1]];
 	}
-	return sum;
+	cost = sum;
 }
+
+void Tour::randomise()
+{
+	for(int i = 1; i <= POP_SIZE; i++)
+	{
+		std::random_shuffle (&order[1],&order[nocities]+1);
+		setcost();
+	}
+}
+
+void Tour::print()
+{
+	for(int i = 1; i <= nocities; i++){
+		std::cout << order[i];
+	}
+}
+/*/Performs simple natural selection by removing few tours and duplicating some tours
+void Genetic::natseln(int triplicates, int duplicates)
+{
+	int costs[POP_SIZE];
+
+}*/
+

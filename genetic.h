@@ -1,35 +1,49 @@
 /*
- * Genetic Algorithm
+ * genetic.h
+ *
+ *  Created on: 28-Sep-2014
+ *      Authors: Kaushik, Pramod
  */
 
-#ifndef GENETIC_H
-#define GENETIC_H
+#ifndef GENETIC_H_
+#define GENETIC_H_
 
-#define POP_SIZE 100 
+#define POP_SIZE 100
 
-class Genetic {
+class Tour {
+
+				int cost;
+				int *order;
+
+			public:
+				Tour();
+				int getcost(){
+					return cost;
+				}
+				void setcost();
+				void randomise();
+				void print();
+	};
+
+
+class Generation {
 
 	
-	int nocities;
-	float**  distances;
-	int **generation;
+		Tour soln;
+		Tour candidates[POP_SIZE+1];
 
 	public:
-		 Genetic(int a, float** B);
-		 
-		 void Initializer ();
-
-		 int cost(int* tour);
-
-		 void printgen();
-
-		 int* getsoln();
-
+		void print();
+		void initialize ();
 
 };
 
+class Genetic {
+	Generation gen;
+	public:
+		 //Genetic(int a, float** B);
+		 int* getsoln();
+};
 
 
-
-#endif 
-
+#endif /* GENETIC_H_ */

@@ -1,20 +1,29 @@
-#include <iostream>
-#include "genetic.h"
+/*
+ * main.cpp
+ *
+ *  Created on: 28-Sep-2014
+ *      Authors: Kaushik, Pramod
+ */
+
+#include<iostream>
+#include"genetic.h"
 
 using namespace std;
+int nocities;
+float **distances;
 
+//main function takes input and calls genetic solver
 int main()
 {
-	int nocities;
-	float **distances;
+	
 	float coordinates;
 
 	cin >> nocities;
 	distances = new float*[nocities+1];
-	for(int i = 1; i <= nocities; ++i) {
+	for(int i = 0; i <= nocities; ++i) {
     	distances[i] = new float[nocities+1];
 	}
-	
+
 	for(int i=1; i<= nocities*2; i++){
 		cin >> coordinates;
 	}
@@ -26,9 +35,11 @@ int main()
 	}
 	cerr << "Input read successfully" << endl;
 
-	Genetic geneticsolver(nocities,distances);
+	Genetic geneticsolver;//(nocities,distances);
 
 	geneticsolver.getsoln();
 
 	return 0;
 }
+
+
