@@ -13,6 +13,7 @@
 class Tour {
 
 				int cost;
+			public:
 				int *order;
 
 			public:
@@ -35,7 +36,10 @@ class Generation {
 	public:
 		void print();
 		void initialize ();
-
+		void crossover();
+		Tour* simplecrossover(Tour parent1, Tour parent2);
+		void ordercrossover(Tour* children,Tour parent1, Tour parent2);
+		bool search(int a, int* arr);
 };
 
 class Genetic {
