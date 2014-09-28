@@ -24,6 +24,7 @@ class Tour {
 				void setcost();
 				void randomise();
 				void print();
+				bool operator<(Tour);
 	};
 
 
@@ -36,10 +37,23 @@ class Generation {
 	public:
 		void print();
 		void initialize ();
+
 		void crossover();
 		Tour* simplecrossover(Tour parent1, Tour parent2);
-		void ordercrossover(Tour* children,Tour parent1, Tour parent2);
+		void ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,int ,int);
 		bool search(int a, int* arr);
+
+		void natseln(int);
+		void setmaxtours(Tour**,int);
+		void setmintours(Tour**,int);
+		void setmintours(Tour*,int,Tour* src);
+		int getminindex(Tour**,int);
+		int getmaxindex(Tour**,int);
+		int getmaxindex(Tour*,int);
+		void bestoffour(Tour* , Tour*, Tour parent1 ,Tour parent2);
+	//	void
+
+
 };
 
 class Genetic {
