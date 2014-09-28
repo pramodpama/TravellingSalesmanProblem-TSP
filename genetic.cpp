@@ -22,6 +22,7 @@ extern float**  distances;
 int* Genetic::getsoln(){
 
 	gen.initialize();
+	gen.natseln(20);
 	gen.print();
 
 	return NULL;
@@ -83,10 +84,86 @@ void Tour::print()
 		std::cout << order[i];
 	}
 }
-/*/Performs simple natural selection by removing few tours and duplicating some tours
-void Genetic::natseln(int triplicates, int duplicates)
+
+bool Tour::operator<(Tour b){
+	if(this->getcost()<b.getcost())
+		return true;
+	else
+		return false;
+}
+
+//Performs simple natural selection by removing few tours and duplicating some tours
+void Generation::natseln(int duplicates)
 {
-	int costs[POP_SIZE];
+	Tour** max = new Tour*[duplicates];
+	Tour** min = new Tour*[duplicates];
 
-}*/
+	setmaxtours(max,duplicates);
+	setmintours(min,duplicates);
 
+	/*std::cerr << "Max tours are ";
+	for(int i=0; i<duplicates; i++){
+		std::cerr << " " << max[i]->getcost();
+	}
+	std::cerr << std::endl;
+
+	std::cerr << "Min tours are ";
+	for(int i=0; i<duplicates; i++){
+		std::cerr << " " << min[i]->getcost();
+	}
+	std::cerr << std::endl;*/
+
+
+	for(int i=0; i<duplicates; i++){
+		*(max[i])=*(min[i]);
+	}
+
+}
+
+void Generation::setmaxtours(Tour** temp,int size){
+	int minindex;
+	for(int i=0; i<size; i++){
+		temp[i] = &candidates[i+1];
+	}
+	minindex = getminindex(temp,size);
+
+	for(int i=1+size; i<=POP_SIZE; i++){
+		if(*temp[minindex]<candidates[i]){
+			temp[minindex]=&candidates[i];
+			minindex = getminindex(temp,size);
+		}
+	}
+}
+
+int Generation::getminindex(Tour** job,int size){
+	int minindex =0;
+	for(int i=1; i<size; i++){
+		if(*job[i]<*job[minindex])
+			minindex = i;
+	}
+	return minindex;
+}
+
+void Generation::setmintours(Tour** temp,int size){
+	int maxindex;
+	for(int i=0; i<size; i++){
+		temp[i] = &candidates[i+1];
+	}
+	maxindex = getmaxindex(temp,size);
+
+	for(int i=1+size; i<=POP_SIZE; i++){
+		if(candidates[i]<*temp[maxindex]){
+			temp[maxindex]=&candidates[i];
+			maxindex = getmaxindex(temp,size);
+		}
+	}
+}
+
+int Generation::getmaxindex(Tour** job,int size){
+	int maxindex =0;
+	for(int i=0; i<size; i++){
+		if(*job[maxindex]<*job[i])
+			maxindex = i;
+	}
+	return maxindex;
+}

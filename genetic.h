@@ -23,6 +23,7 @@ class Tour {
 				void setcost();
 				void randomise();
 				void print();
+				bool operator<(Tour);
 	};
 
 
@@ -35,6 +36,12 @@ class Generation {
 	public:
 		void print();
 		void initialize ();
+		void natseln(int);
+		void setmaxtours(Tour**,int);
+		void setmintours(Tour**,int);
+		int getminindex(Tour**,int);
+		int getmaxindex(Tour**,int);
+	//	void
 
 };
 
