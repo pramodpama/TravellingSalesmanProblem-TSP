@@ -1,4 +1,6 @@
 #include <iostream>
+#include "genetic.h"
+
 using namespace std;
 
 int main()
@@ -10,7 +12,7 @@ int main()
 	cin >> nocities;
 	distances = new float*[nocities+1];
 	for(int i = 1; i <= nocities; ++i) {
-    	distances[i] = new float[nocities];
+    	distances[i] = new float[nocities+1];
 	}
 	
 	for(int i=1; i<= nocities*2; i++){
@@ -24,7 +26,9 @@ int main()
 	}
 	cerr << "Input read successfully" << endl;
 
-	Genetic* geneticsolver = new Genetic(nocities,distances);
+	Genetic geneticsolver(nocities,distances);
+
+	geneticsolver.getsoln();
 
 	return 0;
 }
