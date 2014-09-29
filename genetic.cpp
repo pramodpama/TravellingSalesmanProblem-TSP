@@ -9,12 +9,12 @@
 #include "genetic.h"
 #include <algorithm>
 #include <iostream>
- using namespace std;
+using namespace std;
 
 extern const int nocities;
 extern const float**  distances;
-#define GENERATIONS 1
-
+#define GENERATIONS 10
+#define OPTITER 3
 
 int* Genetic::getsoln(){
 
@@ -22,6 +22,7 @@ int* Genetic::getsoln(){
 	for(int i=1; i<=GENERATIONS; i++){
 		gen.natseln(15);
 		gen.crossover();
+		gen.optimize();
 		gen.print();
 		cout << "END of generation " <<i <<endl;
 	}
@@ -91,6 +92,35 @@ bool Tour::operator<(Tour b){
 		return true;
 	else
 		return false;
+}
+
+void Tour::optimize(){
+	int newcost=0 ,oldcost;
+	int temp;
+	int itercount = 1;
+//	bool modified = true;
+	while(itercount<=OPTITER/*modified==true*/){
+		for(int i=2;i<nocities-1;i++){
+			for(int j= i+1;j<=nocities-1;j++){
+//				modified = false;
+				oldcost = getcost();
+				newcost = oldcost
+						- distances[order[i]] [order[i+1]] - distances [order[i]] [order[i-1]]
+						- distances[order[j]] [order[j+1]] - distances [order[j]] [order[j-1]]
+						+ distances[order[j]] [order[i+1]] + distances [order[j]] [order[i-1]]
+						+ distances[order[i]] [order[j+1]] + distances [order[i]] [order[j-1]];
+
+				if (newcost < oldcost){
+					temp = order[i];
+					order[i] = order[j];
+					order[j] = temp;
+					setcost();
+//					modified = true;
+				}
+			}
+		}
+		itercount++;
+	}
 }
 
 //Performs simple natural selection by removing few tours and duplicating some tours
@@ -304,4 +334,10 @@ void Generation::bestoffour(Tour* child1, Tour* child2,Tour parent1 ,Tour parent
 
 	*child1 = temp[0];
 	*child2 = temp[1];	
+}
+
+void Generation::optimize(){
+	for(int i=1;i<=nocities;i++){
+		candidates[i].optimize();
+	}
 }

@@ -25,6 +25,7 @@ class Tour {
 				void randomise();
 				void print();
 				bool operator<(Tour);
+				void optimize();
 	};
 
 
@@ -51,7 +52,7 @@ class Generation {
 		int getmaxindex(Tour**,int);
 		int getmaxindex(Tour*,int);
 		void bestoffour(Tour* , Tour*, Tour parent1 ,Tour parent2);
-	
+		void optimize();
 
 
 };
