@@ -39,8 +39,8 @@ class Generation {
 		void initialize ();
 
 		void crossover();
-		Tour* simplecrossover(Tour parent1, Tour parent2);
-		void ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,int ,int);
+		
+		void ordercrossover(Tour* parent1, Tour* parent2,int ,int);
 		bool search(int a, int* arr);
 
 		void natseln(int);
@@ -51,7 +51,7 @@ class Generation {
 		int getmaxindex(Tour**,int);
 		int getmaxindex(Tour*,int);
 		void bestoffour(Tour* , Tour*, Tour parent1 ,Tour parent2);
-	//	void
+	
 
 
 };

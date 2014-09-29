@@ -7,7 +7,7 @@
 
 #include<iostream>
 #include"genetic.h"
-
+#include<string>
 using namespace std;
 int nocities;
 float **distances;
@@ -17,6 +17,8 @@ int main()
 {
 	
 	float coordinates;
+	string str;
+	cin >> str;
 
 	cin >> nocities;
 	distances = new float*[nocities+1];

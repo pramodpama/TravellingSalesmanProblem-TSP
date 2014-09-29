@@ -13,23 +13,18 @@
 
 extern const int nocities;
 extern const float**  distances;
-#define GENERATIONS 10
+#define GENERATIONS 1
 
-/*Genetic::Genetic(int a,float** B)
-{
-	nocities = a ;
-	distances = B ;
-}*/
 
 int* Genetic::getsoln(){
 
 	gen.initialize();
-//	for(int i=1; i<=GENERATIONS; i++){
+	for(int i=1; i<=GENERATIONS; i++){
 		gen.natseln(15);
 		gen.crossover();
-//	}
-
-	gen.print();
+		gen.print();
+		cout << "END of generation " <<i <<endl;
+	}
 
 	return NULL;
 }
@@ -59,7 +54,7 @@ Tour::Tour()
 {
 	order = new int[nocities+1];
 
-	for(int i=0; i<=nocities; i++){       // i should be 1
+	for(int i=1; i<=nocities; i++){      
 		order[i] = i;
 	}
 }
@@ -156,53 +151,27 @@ void Generation::crossover()
 
 
 	Tour children[3];
+	//std::random_shuffle (&candidates[1],&candidates[POP_SIZE]+1);
 //	children[1].print();
 	for (int i = 1; i < POP_SIZE; i=i+2)
 	{
-		ordercrossover(/*children,*/&candidates[i],&candidates[i+1],i,i+1);
-	//	bestoffour(children,candidates[i],candidates[i+1]);
-		//candidates[i] = children[1];
-	//	cout << "\nin crossover \n";
-	  //  candidates[i].print();	
-		//candidates[i+1] = children[2];
+		ordercrossover(&candidates[i],&candidates[i+1],i,i+1);
+	
 	}
+	
 	for (int i = 1; i <= POP_SIZE; i++)
 		candidates[i].setcost();
 
 
 }
-/*
-Tour* Generation::simplecrossover(Tour parent1, Tour parent2)
+
+
+void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 {
-	Tour children[3];
 
-	for (int i = 1; i <= POP_SIZE; i++)
-	{
-		if(i <= (POP_SIZE/2) )
-			children[1].order[i]=parent1.order[i];
-		else
-			children[1].order[i]=parent2.order[i];
-		
-	}
-
-	for (int i = 1; i <= POP_SIZE; i++)
-	{
-		if(i <= (POP_SIZE/2) )
-			children[2].order[i]=parent2.order[i];
-		else
-			children[2].order[i]=parent1.order[i];
-		
-	}
-
-	return children;	
-
-} */
-
-
-void Generation::ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,int z,int x)
-{
-	int part1[50];      //for 100 cities
-	int part2[50];
+	int genes = nocities/3;
+	int* part1 = new int[genes];       
+	int* part2 = new int[genes];
 
 	Tour children[3];
 	/*cout << "\nParents are \n";
@@ -211,7 +180,7 @@ void Generation::ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,
 	parent2->setcost(); cout << parent2->getcost() << "\t";// parent2->print();*/
 
 	int j=0,i;
-	for (i = 25; i <= 75 ; i++)
+	for (i = genes+1; i <= 2*genes ; i++)
 	{
 	
 			children[1].order[i]=parent1->order[i];
@@ -221,24 +190,27 @@ void Generation::ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,
 			children[2].order[i]=parent2->order[i];
 			
 	}
+
 	i = 1;
 	j = 1;
 	int k = 1;
-	while(i <= 100)
+	
+	while(i <= nocities)
 	{
 		if(!search(parent2->order[i], part1))
 		{
 			children[1].order[j] = parent2->order[i];
-			if(j==24)
-				j = 76;
+			if(j==genes)
+				j = 2*genes+1;
 			else j++;
+		
 		}
 
 		if(!search(parent1->order[i],part2))
 		{
 			children[2].order[k] = parent1->order[i];
-			if(k==24)
-				k = 76;
+			if(k==genes)
+				k = 2*genes+1 ;
 			else k++;
 		}
 
@@ -266,7 +238,9 @@ void Generation::ordercrossover(/*Tour* children,*/Tour* parent1, Tour* parent2,
 
 bool Generation::search(int a, int* arr)
 {
-	for (int i = 0; i < 50; i++)
+	int genes = nocities/3;	
+
+	for (int i = 0; i < genes; i++)
 	{
 		if(a == arr[i])
 			return true;
