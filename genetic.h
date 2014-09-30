@@ -9,16 +9,19 @@
 #define GENETIC_H_
 
 #define POP_SIZE 100
+#define CHANGED true
+#define UNCHANGED false
+
 
 class Tour {
 
-				int cost;
+				float cost;
 			public:
 				int *order;
 
 			public:
 				Tour();
-				int getcost(){
+				float getcost(){
 					return cost;
 				}
 				void setcost();
@@ -33,10 +36,12 @@ class Tour {
 class Generation {
 
 	
-		Tour soln;
 		Tour candidates[POP_SIZE+1];
 
 	public:
+		bool solnflag;
+		Tour soln;
+		
 		void print();
 		void initialize ();
 

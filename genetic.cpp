@@ -15,25 +15,33 @@ using namespace std;
 extern const int nocities;
 extern const float**  distances;
 
-#define GENERATIONS 60
+#define GENERATIONS 50000
 
 #define OPTITER 1
 
 int* Genetic::getsoln(){
 
 	gen.initialize();
+	gen.soln.setcost();
+	//gen.print(); cout << endl;
 	for(int i=1; i<=GENERATIONS; i++){
 		gen.natseln(15);
+		//gen.print();
 		gen.crossover();
-//		cout << "Generation before optimization " << endl;
-//		gen.print();
-//		cout << "Generation after optimization " << endl;
-	//	if(i<POP_SIZE/2)
-			gen.generate_mutate(i*2/5);
-	//	else
-		//	gen.generate_mutate(POP_SIZE/5);
+		//cout << "Generation before optimization " << endl;
+		//gen.print();
+		//cout << "Generation after optimization " << endl;
+		if(i<POP_SIZE)
+			gen.generate_mutate(i);
+		else
+			gen.generate_mutate(POP_SIZE);
 		gen.optimize();
-		gen.print();
+		if(gen.solnflag==CHANGED){
+			cout << "printing solution\t";
+			gen.soln.print();
+			gen.solnflag = UNCHANGED;
+		}
+		//gen.print();
 	//	cout << "END of generation " <<i <<endl;
 		//cout << "END " <<i*2/5 <<endl;
 	}
@@ -59,14 +67,14 @@ void Generation::print()
 	for(i = 1; i <= POP_SIZE; i++)
 	{
 
-		std::cout << candidates[i].getcost() << " ";
-	//	candidates[i].print();
+		//std::cout << candidates[i].getcost() << " ";
+		candidates[i].print();
 
 	//	std::cout << "candidate no." << i << "\t" << candidates[i].getcost() << " ";
 		//candidates[i].print();
-
-		std::cout << "\n";
 	}
+	
+	std::cout << "\n";
 }
 
 Tour::Tour()
@@ -76,17 +84,18 @@ Tour::Tour()
 	for(int i=1; i<=nocities; i++){      
 		order[i] = i;
 	}
+	
 }
 
 void Tour::setcost()
 {
 	int i;
-	int sum = 0;
+	float sum = 0.0;
 	for(i=1;i<nocities;i++)
 	{
 		sum += distances[order[i]][order[i+1]];
 	}
-	cost = sum;
+	cost = (float) sum + distances[order[nocities]][order[1]];
 }
 
 void Tour::randomise()
@@ -95,14 +104,18 @@ void Tour::randomise()
 	{
 		std::random_shuffle (&order[1],&order[nocities]+1);
 		setcost();
+	//	print();
+		//cout<<i<<"  \n";
 	}
 }
 
 void Tour::print()
 {
+	cout << cost << "\t\t";
 	for(int i = 1; i <= nocities; i++){
 		std::cout << order[i] << " ";
 	}
+	cout << endl;
 }
 
 bool Tour::operator<(Tour b){
@@ -113,20 +126,46 @@ bool Tour::operator<(Tour b){
 }
 
 void Tour::optimize(){
-	int newcost=0 ,oldcost;
+	float newcost=0.0 ,oldcost;
 	int temp;
 //	int itercount = 1;
 	bool modified = true;
 	while(/*itercount<=OPTITER*/modified==true){
 		modified = false;
-		for(int i=2;i<nocities-1;i++){
-			for(int j= i+2;j<=nocities-1;j++){
+		for(int i=1;i<nocities-1;i++){
+			for(int j= i+2;j<=nocities;j++){
 				oldcost = getcost();
-				newcost = oldcost
+						
+						if(i==1 && j==nocities){				
+						newcost = oldcost
+						-( distances[order[1]] [order[2]] + distances [order[nocities]] [order[nocities-1]])
+						+( distances[order[1]] [order[nocities-1]] + distances [order[2]] [order[nocities]]);
+						}
+						
+						else if(i==1 && j!=nocities){
+						newcost = oldcost
+						-( distances[order[i]] [order[i+1]] + distances [order[nocities]] [order[i]]
+						+ distances[order[j]] [order[j+1]] + distances [order[j-1]] [order[j]])
+						+( distances[order[j]] [order[i+1]] + distances [order[nocities]] [order[j]]
+						+ distances[order[i]] [order[j+1]] + distances [order[j-1]] [order[i]]);
+						}
+						
+						else if(j==nocities && i!=1){
+						newcost = oldcost
+						-( distances[order[i]] [order[i+1]] + distances [order[i-1]] [order[i]]
+						+ distances[order[j]] [order[1]] + distances [order[j-1]] [order[j]])
+						+( distances[order[j]] [order[i+1]] + distances [order[i-1]] [order[j]]
+						+ distances[order[i]] [order[1]] + distances [order[j-1]] [order[i]]);
+						}
+						
+						else{
+						newcost = oldcost
 						-( distances[order[i]] [order[i+1]] + distances [order[i-1]] [order[i]]
 						+ distances[order[j]] [order[j+1]] + distances [order[j-1]] [order[j]])
 						+( distances[order[j]] [order[i+1]] + distances [order[i-1]] [order[j]]
 						+ distances[order[i]] [order[j+1]] + distances [order[j-1]] [order[i]]);
+						}					
+						
 
 				if (newcost < oldcost){
 					temp = order[i];
@@ -361,6 +400,10 @@ void Generation::bestoffour(Tour* child1, Tour* child2,Tour parent1 ,Tour parent
 void Generation::optimize(){
 	for(int i=1;i<=POP_SIZE;i++){
 		candidates[i].optimize();
+		if(candidates[i]<soln){
+			soln = candidates[i];
+			solnflag = CHANGED;
+		}
 	}
 }
 

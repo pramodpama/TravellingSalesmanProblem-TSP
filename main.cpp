@@ -17,10 +17,10 @@ int main()
 {
 	
 	float coordinates;
-	string str;
+	string str, str1;
 	cin >> str;
-	//if(str=="non")
-		//cin >> str;
+	if(str=="non")
+		cin >> str1;
 
 	cin >> nocities;
 	distances = new float*[nocities+1];
