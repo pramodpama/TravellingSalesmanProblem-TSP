@@ -9,12 +9,13 @@
 #include "genetic.h"
 #include <algorithm>
 #include <iostream>
+#include <stdlib.h>
 using namespace std;
 
 extern const int nocities;
 extern const float**  distances;
-#define GENERATIONS 10
-#define OPTITER 3
+#define GENERATIONS 50
+#define OPTITER 1
 
 int* Genetic::getsoln(){
 
@@ -46,7 +47,7 @@ void Generation::print()
 	for(i = 1; i <= POP_SIZE; i++)
 	{
 		std::cout << candidates[i].getcost() << " ";
-		//candidates[i].print();
+	//	candidates[i].print();
 		std::cout << "\n";
 	}
 }
@@ -105,10 +106,10 @@ void Tour::optimize(){
 //				modified = false;
 				oldcost = getcost();
 				newcost = oldcost
-						- distances[order[i]] [order[i+1]] - distances [order[i]] [order[i-1]]
-						- distances[order[j]] [order[j+1]] - distances [order[j]] [order[j-1]]
-						+ distances[order[j]] [order[i+1]] + distances [order[j]] [order[i-1]]
-						+ distances[order[i]] [order[j+1]] + distances [order[i]] [order[j-1]];
+						- distances [order[i]] [order[i+1]] - distances [order[i]] [order[i-1]]
+						- distances [order[j]] [order[j+1]] - distances [order[j]] [order[j-1]]
+						+ distances [order[j]] [order[i+1]] + distances [order[j]] [order[i-1]]
+						+ distances [order[i]] [order[j+1]] + distances [order[i]] [order[j-1]];
 
 				if (newcost < oldcost){
 					temp = order[i];
@@ -181,14 +182,22 @@ void Generation::crossover()
 
 
 	Tour children[3];
-	//std::random_shuffle (&candidates[1],&candidates[POP_SIZE]+1);
+	std::random_shuffle (&candidates[1],&candidates[POP_SIZE]+1);
 //	children[1].print();
+
 	for (int i = 1; i < POP_SIZE; i=i+2)
 	{
 		ordercrossover(&candidates[i],&candidates[i+1],i,i+1);
 	
 	}
-	
+
+	/*candidates[1].mutate();
+	candidates[nocities].mutate();
+	candidates[10].mutate();
+	candidates[15].mutate();
+	candidates[76].mutate();
+	candidates[43].mutate();*/
+		
 	for (int i = 1; i <= POP_SIZE; i++)
 		candidates[i].setcost();
 
@@ -340,4 +349,27 @@ void Generation::optimize(){
 	for(int i=1;i<=nocities;i++){
 		candidates[i].optimize();
 	}
+}
+
+
+void Tour::mutate ()
+{
+
+	time_t t;
+	srand((unsigned) time(&t));
+	int temp;
+	int i = 0;
+	int j = 0;
+
+	while (j == i)
+	{
+		i = rand()%nocities+1;
+		j = rand()%nocities+1;
+	}
+
+	temp = order[i];
+	order[i] = order[j];
+	order[j] = temp;
+
+	setcost();
 }

@@ -26,6 +26,7 @@ class Tour {
 				void print();
 				bool operator<(Tour);
 				void optimize();
+				void mutate();
 	};
 
 
