@@ -14,7 +14,9 @@ using namespace std;
 
 extern const int nocities;
 extern const float**  distances;
-#define GENERATIONS 50
+
+#define GENERATIONS 60
+
 #define OPTITER 1
 
 int* Genetic::getsoln(){
@@ -23,10 +25,20 @@ int* Genetic::getsoln(){
 	for(int i=1; i<=GENERATIONS; i++){
 		gen.natseln(15);
 		gen.crossover();
+//		cout << "Generation before optimization " << endl;
+//		gen.print();
+//		cout << "Generation after optimization " << endl;
+	//	if(i<POP_SIZE/2)
+			gen.generate_mutate(i*2/5);
+	//	else
+		//	gen.generate_mutate(POP_SIZE/5);
 		gen.optimize();
 		gen.print();
-		cout << "END of generation " <<i <<endl;
+	//	cout << "END of generation " <<i <<endl;
+		//cout << "END " <<i*2/5 <<endl;
 	}
+	
+	//gen.print();
 
 	return NULL;
 }
@@ -46,8 +58,13 @@ void Generation::print()
 
 	for(i = 1; i <= POP_SIZE; i++)
 	{
+
 		std::cout << candidates[i].getcost() << " ";
 	//	candidates[i].print();
+
+	//	std::cout << "candidate no." << i << "\t" << candidates[i].getcost() << " ";
+		//candidates[i].print();
+
 		std::cout << "\n";
 	}
 }
@@ -98,29 +115,29 @@ bool Tour::operator<(Tour b){
 void Tour::optimize(){
 	int newcost=0 ,oldcost;
 	int temp;
-	int itercount = 1;
-//	bool modified = true;
-	while(itercount<=OPTITER/*modified==true*/){
+//	int itercount = 1;
+	bool modified = true;
+	while(/*itercount<=OPTITER*/modified==true){
+		modified = false;
 		for(int i=2;i<nocities-1;i++){
-			for(int j= i+1;j<=nocities-1;j++){
-//				modified = false;
+			for(int j= i+2;j<=nocities-1;j++){
 				oldcost = getcost();
 				newcost = oldcost
-						- distances [order[i]] [order[i+1]] - distances [order[i]] [order[i-1]]
-						- distances [order[j]] [order[j+1]] - distances [order[j]] [order[j-1]]
-						+ distances [order[j]] [order[i+1]] + distances [order[j]] [order[i-1]]
-						+ distances [order[i]] [order[j+1]] + distances [order[i]] [order[j-1]];
+						-( distances[order[i]] [order[i+1]] + distances [order[i-1]] [order[i]]
+						+ distances[order[j]] [order[j+1]] + distances [order[j-1]] [order[j]])
+						+( distances[order[j]] [order[i+1]] + distances [order[i-1]] [order[j]]
+						+ distances[order[i]] [order[j+1]] + distances [order[j-1]] [order[i]]);
 
 				if (newcost < oldcost){
 					temp = order[i];
 					order[i] = order[j];
 					order[j] = temp;
 					setcost();
-//					modified = true;
+					modified = true;
 				}
 			}
 		}
-		itercount++;
+//		itercount++;
 	}
 }
 
@@ -191,13 +208,9 @@ void Generation::crossover()
 	
 	}
 
-	/*candidates[1].mutate();
-	candidates[nocities].mutate();
-	candidates[10].mutate();
-	candidates[15].mutate();
-	candidates[76].mutate();
-	candidates[43].mutate();*/
-		
+
+	//generate_mutate(10);
+
 	for (int i = 1; i <= POP_SIZE; i++)
 		candidates[i].setcost();
 
@@ -346,7 +359,7 @@ void Generation::bestoffour(Tour* child1, Tour* child2,Tour parent1 ,Tour parent
 }
 
 void Generation::optimize(){
-	for(int i=1;i<=nocities;i++){
+	for(int i=1;i<=POP_SIZE;i++){
 		candidates[i].optimize();
 	}
 }
@@ -356,7 +369,7 @@ void Tour::mutate ()
 {
 
 	time_t t;
-	srand((unsigned) time(&t));
+	//srand((unsigned) time(&t));
 	int temp;
 	int i = 0;
 	int j = 0;
@@ -366,10 +379,22 @@ void Tour::mutate ()
 		i = rand()%nocities+1;
 		j = rand()%nocities+1;
 	}
-
+	//cout << i <<" " << j<<endl;
 	temp = order[i];
 	order[i] = order[j];
 	order[j] = temp;
 
 	setcost();
+}
+
+
+void Generation::generate_mutate(int num)
+{
+	int a;
+	for (int i = 1; i <= num; ++i)
+	{
+		//a = rand()%POP_SIZE+1;
+		candidates[POP_SIZE-i].mutate();
+		//cout <<"candidates" <<a <<endl;
+	}
 }

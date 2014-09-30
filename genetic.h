@@ -54,6 +54,7 @@ class Generation {
 		int getmaxindex(Tour*,int);
 		void bestoffour(Tour* , Tour*, Tour parent1 ,Tour parent2);
 		void optimize();
+		void generate_mutate(int num);
 
 
 };

@@ -19,6 +19,8 @@ int main()
 	float coordinates;
 	string str;
 	cin >> str;
+	//if(str=="non")
+		//cin >> str;
 
 	cin >> nocities;
 	distances = new float*[nocities+1];
@@ -37,8 +39,7 @@ int main()
 	}
 	cerr << "Input read successfully" << endl;
 
-	Genetic geneticsolver;//(nocities,distances);
-
+	Genetic geneticsolver;
 	geneticsolver.getsoln();
 
 	return 0;
