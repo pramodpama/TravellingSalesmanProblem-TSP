@@ -7,6 +7,13 @@
 
 #include<iostream>
 #include"genetic.h"
+/*
+ * genetic.h
+ *
+ *  Created on: 28-Sep-2014
+ *      Authors: Kaushik, Pramod
+ */
+
 #include<string>
 using namespace std;
 int nocities;

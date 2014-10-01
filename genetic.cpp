@@ -28,25 +28,21 @@ int* Genetic::getsoln(){
 		gen.natseln(15);
 		//gen.print();
 		gen.crossover();
-		//cout << "Generation before optimization " << endl;
-		//gen.print();
-		//cout << "Generation after optimization " << endl;
+		
 		if(i<POP_SIZE)
 			gen.generate_mutate(i);
 		else
 			gen.generate_mutate(POP_SIZE);
 		gen.optimize();
 		if(gen.solnflag==CHANGED){
-			cout << "printing solution\t";
+			//cout << "printing solution\t";
 			gen.soln.print();
+			cout.flush();
 			gen.solnflag = UNCHANGED;
 		}
-		//gen.print();
-	//	cout << "END of generation " <<i <<endl;
-		//cout << "END " <<i*2/5 <<endl;
+	
 	}
 	
-	//gen.print();
 
 	return NULL;
 }
@@ -55,7 +51,7 @@ void Generation::initialize ()
 {
 	for(int i = 1; i <= POP_SIZE; i++)
 	{
-		candidates[i].randomise();                            // didn't understand this
+		candidates[i].randomise();                            
 		//std::cerr << cost(&generation[i][0]) << "\n";
 	}
 }
@@ -70,8 +66,6 @@ void Generation::print()
 		//std::cout << candidates[i].getcost() << " ";
 		candidates[i].print();
 
-	//	std::cout << "candidate no." << i << "\t" << candidates[i].getcost() << " ";
-		//candidates[i].print();
 	}
 	
 	std::cout << "\n";
@@ -111,7 +105,7 @@ void Tour::randomise()
 
 void Tour::print()
 {
-	cout << cost << "\t\t";
+//	cout << cost << "\t\t";
 	for(int i = 1; i <= nocities; i++){
 		std::cout << order[i] << " ";
 	}
@@ -189,19 +183,6 @@ void Generation::natseln(int duplicates)
 	setmaxtours(max,duplicates);
 	setmintours(min,duplicates);
 
-	/*std::cerr << "Max tours are ";
-	for(int i=0; i<duplicates; i++){
-		std::cerr << " " << max[i]->getcost();
-	}
-	std::cerr << std::endl;
-
-	std::cerr << "Min tours are ";
-	for(int i=0; i<duplicates; i++){
-		std::cerr << " " << min[i]->getcost();
-	}
-	std::cerr << std::endl;*/
-
-
 	for(int i=0; i<duplicates; i++){
 		*(max[i])=*(min[i]);
 	}
@@ -248,8 +229,6 @@ void Generation::crossover()
 	}
 
 
-	//generate_mutate(10);
-
 	for (int i = 1; i <= POP_SIZE; i++)
 		candidates[i].setcost();
 
@@ -265,10 +244,7 @@ void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 	int* part2 = new int[genes];
 
 	Tour children[3];
-	/*cout << "\nParents are \n";
-	parent1->setcost(); cout << parent1->getcost() << "\t";// parent1->print();
-	cout << endl;
-	parent2->setcost(); cout << parent2->getcost() << "\t";// parent2->print();*/
+
 
 	int j=0,i;
 	for (i = genes+1; i <= 2*genes ; i++)
@@ -308,20 +284,9 @@ void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 		i++;
 	}	
 	
-	/*cout << "\nchildren before bestoffour\n";
-	children[1].setcost(); cout << children[1].getcost();//children[1].print();
-	cout << endl;
-	children[2].setcost(); cout << children[2].getcost();//children[2].print();*/
 	
 	bestoffour(&children[1],&children[2],*parent1,*parent2);
-	//parent1 = &children[1];
-	//parent2 = &children[2];
 
-	/*cout << "\nchildren after bestoffour\n";
-	children[1].setcost(); cout << children[1].getcost();//children[1].print();
-	cout << endl;
-	children[2].setcost(); cout << children[2].getcost();//children[2].print();
-	cout << endl;*/
 
 	candidates[z] = children[1];
 	candidates[x] = children[2];
@@ -422,10 +387,12 @@ void Tour::mutate ()
 		i = rand()%nocities+1;
 		j = rand()%nocities+1;
 	}
-	//cout << i <<" " << j<<endl;
+
 	temp = order[i];
 	order[i] = order[j];
 	order[j] = temp;
+
+
 
 	setcost();
 }
@@ -438,6 +405,6 @@ void Generation::generate_mutate(int num)
 	{
 		//a = rand()%POP_SIZE+1;
 		candidates[POP_SIZE-i].mutate();
-		//cout <<"candidates" <<a <<endl;
+		
 	}
 }
