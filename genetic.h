@@ -9,6 +9,7 @@
 #define GENETIC_H_
 
 #define POP_SIZE 100
+
 #define CHANGED true
 #define UNCHANGED false
 

@@ -10,14 +10,19 @@
 #include <algorithm>
 #include <iostream>
 #include <stdlib.h>
+ #include <stdio.h>
 using namespace std;
+
+#include "bst.h"
 
 extern const int nocities;
 extern const float**  distances;
 
 #define GENERATIONS 50000
 
-#define OPTITER 1
+#define OPTITER 2
+
+#define FACTOR 10000
 
 int* Genetic::getsoln(){
 
@@ -49,16 +54,28 @@ int* Genetic::getsoln(){
 
 void Generation::initialize ()
 {
-	for(int i = 1; i <= POP_SIZE; i++)
+	firstrace = candidates;
+	register int i;
+	register Tour* newtour;
+	register tree* racetree = 0;
+	for(i = 1; i <= POP_SIZE * FACTOR; i++)
 	{
-		candidates[i].randomise();                            
-		//std::cerr << cost(&generation[i][0]) << "\n";
+		newtour = new Tour;
+		newtour->randomise();
+		newtour->setcost();
+		racetree = insert (racetree, newtour, newtour->getcost());
+		//printf ("\nBest found = %f\tWorst = %f\n", best(racetree), maxnode);
 	}
+
+	//printf ("\nBest found = %f\tWorst = %f\n", best(racetree), maxnode);
+	stash (racetree);
+
+
 }
 
 void Generation::print()
 {
-	int i;
+	register int i;
 
 	for(i = 1; i <= POP_SIZE; i++)
 	{
@@ -74,8 +91,8 @@ void Generation::print()
 Tour::Tour()
 {
 	order = new int[nocities+1];
-
-	for(int i=1; i<=nocities; i++){      
+	register int i;
+	for(i=1; i<=nocities; i++){      
 		order[i] = i;
 	}
 	
@@ -83,7 +100,7 @@ Tour::Tour()
 
 void Tour::setcost()
 {
-	int i;
+	register int i;
 	float sum = 0.0;
 	for(i=1;i<nocities;i++)
 	{
@@ -94,19 +111,15 @@ void Tour::setcost()
 
 void Tour::randomise()
 {
-	for(int i = 1; i <= POP_SIZE; i++)
-	{
 		std::random_shuffle (&order[1],&order[nocities]+1);
 		setcost();
-	//	print();
-		//cout<<i<<"  \n";
-	}
 }
 
 void Tour::print()
 {
-//	cout << cost << "\t\t";
-	for(int i = 1; i <= nocities; i++){
+	cout << cost << "\t\t";
+	register int i;
+	for(i = 1; i <= nocities; i++){
 		std::cout << order[i] << " ";
 	}
 	cout << endl;
@@ -122,12 +135,14 @@ bool Tour::operator<(Tour b){
 void Tour::optimize(){
 	float newcost=0.0 ,oldcost;
 	int temp;
-//	int itercount = 1;
-	bool modified = true;
-	while(/*itercount<=OPTITER*/modified==true){
-		modified = false;
-		for(int i=1;i<nocities-1;i++){
-			for(int j= i+2;j<=nocities;j++){
+	register int i;
+	register int j;
+	int itercount = 1;
+	//bool modified = true;
+	while(itercount<=OPTITER/*modified==true*/){
+		//modified = false;
+		for( i=1;i<nocities-1;i++){
+			for( j= i+2;j<=nocities;j++){
 				oldcost = getcost();
 						
 						if(i==1 && j==nocities){				
@@ -166,11 +181,15 @@ void Tour::optimize(){
 					order[i] = order[j];
 					order[j] = temp;
 					setcost();
-					modified = true;
+					//modified = true;
 				}
+
+
 			}
+
+			//reverse(&order[1],&order[nocities+1]);
 		}
-//		itercount++;
+		itercount++;
 	}
 }
 
@@ -183,20 +202,22 @@ void Generation::natseln(int duplicates)
 	setmaxtours(max,duplicates);
 	setmintours(min,duplicates);
 
-	for(int i=0; i<duplicates; i++){
+	register int i;
+	for(i=0; i<duplicates; i++){
 		*(max[i])=*(min[i]);
 	}
 
 }
 
 void Generation::setmaxtours(Tour** temp,int size){
-	int minindex;
-	for(int i=0; i<size; i++){
+	register int minindex;
+	register int i;
+	for(i=0; i<size; i++){
 		temp[i] = &candidates[i+1];
 	}
 	minindex = getminindex(temp,size);
 
-	for(int i=1+size; i<=POP_SIZE; i++){
+	for(i=1+size; i<=POP_SIZE; i++){
 		if(*temp[minindex]<candidates[i]){
 			temp[minindex]=&candidates[i];
 			minindex = getminindex(temp,size);
@@ -206,7 +227,8 @@ void Generation::setmaxtours(Tour** temp,int size){
 
 int Generation::getminindex(Tour** job,int size){
 	int minindex =0;
-	for(int i=1; i<size; i++){
+	register int i;
+	for(i=1; i<size; i++){
 		if(*job[i]<*job[minindex])
 			minindex = i;
 	}
@@ -221,15 +243,15 @@ void Generation::crossover()
 	Tour children[3];
 	std::random_shuffle (&candidates[1],&candidates[POP_SIZE]+1);
 //	children[1].print();
-
-	for (int i = 1; i < POP_SIZE; i=i+2)
+	register int i;
+	for (i = 1; i < POP_SIZE; i=i+2)
 	{
 		ordercrossover(&candidates[i],&candidates[i+1],i,i+1);
 	
 	}
 
 
-	for (int i = 1; i <= POP_SIZE; i++)
+	for (i = 1; i <= POP_SIZE; i++)
 		candidates[i].setcost();
 
 
@@ -239,14 +261,15 @@ void Generation::crossover()
 void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 {
 
-	int genes = nocities/3;
-	int* part1 = new int[genes];       
-	int* part2 = new int[genes];
+	register int genes = nocities/3;
+	register int* part1 = new int[genes];       
+	register int* part2 = new int[genes];
 
 	Tour children[3];
 
 
-	int j=0,i;
+	register int j=0;
+	register int i;
 	for (i = genes+1; i <= 2*genes ; i++)
 	{
 	
@@ -260,7 +283,7 @@ void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 
 	i = 1;
 	j = 1;
-	int k = 1;
+	register int k = 1;
 	
 	while(i <= nocities)
 	{
@@ -294,9 +317,9 @@ void Generation::ordercrossover(Tour* parent1, Tour* parent2,int z,int x)
 
 bool Generation::search(int a, int* arr)
 {
-	int genes = nocities/3;	
-
-	for (int i = 0; i < genes; i++)
+	register int genes = nocities/3;	
+	register int i;
+	for (i = 0; i < genes; i++)
 	{
 		if(a == arr[i])
 			return true;
@@ -306,13 +329,14 @@ bool Generation::search(int a, int* arr)
 }
 
 void Generation::setmintours(Tour** temp,int size){
-	int maxindex;
-	for(int i=0; i<size; i++){
+	register int maxindex;
+	register int i;
+	for(i=0; i<size; i++){
 		temp[i] = &candidates[i+1];
 	}
 	maxindex = getmaxindex(temp,size);
 
-	for(int i=1+size; i<=POP_SIZE; i++){
+	for(i=1+size; i<=POP_SIZE; i++){
 		if(candidates[i]<*temp[maxindex]){
 			temp[maxindex]=&candidates[i];
 			maxindex = getmaxindex(temp,size);
@@ -321,8 +345,9 @@ void Generation::setmintours(Tour** temp,int size){
 }
 
 int Generation::getmaxindex(Tour** job,int size){
-	int maxindex =0;
-	for(int i=0; i<size; i++){
+	register int maxindex =0;
+	register int i;
+	for(i=0; i<size; i++){
 		if(*job[maxindex]<*job[i])
 			maxindex = i;
 	}
@@ -376,11 +401,9 @@ void Generation::optimize(){
 void Tour::mutate ()
 {
 
-	time_t t;
-	//srand((unsigned) time(&t));
-	int temp;
-	int i = 0;
-	int j = 0;
+	register int temp;
+	register int i = 0;
+	register int j = 0;
 
 	while (j == i)
 	{
@@ -400,8 +423,8 @@ void Tour::mutate ()
 
 void Generation::generate_mutate(int num)
 {
-	int a;
-	for (int i = 1; i <= num; ++i)
+	register int i;
+	for (i = 1; i <= num; ++i)
 	{
 		//a = rand()%POP_SIZE+1;
 		candidates[POP_SIZE-i].mutate();

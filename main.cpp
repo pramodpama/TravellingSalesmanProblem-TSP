@@ -7,12 +7,8 @@
 
 #include<iostream>
 #include"genetic.h"
-/*
- * genetic.h
- *
- *  Created on: 28-Sep-2014
- *      Authors: Kaushik, Pramod
- */
+#include <time.h> 
+#include <stdlib.h>
 
 #include<string>
 using namespace std;
@@ -22,6 +18,7 @@ float **distances;
 //main function takes input and calls genetic solver
 int main()
 {
+	 srand (time(NULL));
 	
 	float coordinates;
 	string str, str1;
